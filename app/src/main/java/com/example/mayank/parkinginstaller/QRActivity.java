@@ -79,7 +79,7 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT");
-                details.setText(contents);
+                details.setText("Id of scanned R-pi: " + contents);
                 piId = contents;
             }
             if(resultCode == RESULT_CANCELED){
@@ -117,10 +117,9 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
                 super.onPostExecute(s);
                 loading.dismiss();
                 if (callPhoneMap) {
-                    Toast.makeText(getApplicationContext(), "Response: " + s, Toast.LENGTH_SHORT).show();
-                        Intent myIntent = new Intent(QRActivity.this, SensorActivity.class);
-                        myIntent.putExtra("piId", piId); //Raspberry Pi ID
-                        QRActivity.this.startActivity(myIntent);
+                    Intent myIntent = new Intent(QRActivity.this, SensorActivity.class);
+                    myIntent.putExtra("piId", piId); //Raspberry Pi ID
+                    QRActivity.this.startActivity(myIntent);
                 }else{
                     Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
                 }

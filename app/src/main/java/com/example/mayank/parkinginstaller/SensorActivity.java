@@ -8,6 +8,8 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -67,16 +69,20 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.sensor_menu, menu);
+        return true;
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
         SensorStatus sst = sAdapter.getItem(position);
         Log.i(TAG,"heheee  " + sst.status);
-        int sp = Integer.parseInt(sst.sensorName);
-        sAdapter.setSelectedPort(sp);
-        sAdapter.notifyDataSetChanged();
         if (sst.status){
-
-            Log.i(TAG,"huuuuuuu  " + sp);
-
+            int sp = Integer.parseInt(sst.sensorName);
+            sAdapter.setSelectedPort(sp);
+            sAdapter.notifyDataSetChanged();
             //v.setBackgroundColor(getResources().getColor(R.color.pressed_color));
         }
     }
@@ -87,27 +93,27 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
             try {
                 startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
             } catch (GooglePlayServicesRepairableException e) {
-                Toast.makeText(this,"Google Play Services not available", Toast.LENGTH_SHORT);
+                Toast.makeText(this,"Google Play Services not available", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             } catch (GooglePlayServicesNotAvailableException e) {
-                Toast.makeText(this,"Google Play Services not available", Toast.LENGTH_SHORT);
+                Toast.makeText(this,"Google Play Services not available", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }
         else if (v.getId() == R.id.addSensor){
             int sp = sAdapter.getSelectedPort();
             if (sp == -1){
-                Toast.makeText(this,"Select an empty port first",Toast.LENGTH_LONG);
+                Toast.makeText(this,"Select an empty port first",Toast.LENGTH_LONG).show();
             }
             else if (currentLoc == null){
-                Toast.makeText(this,"Please update current location",Toast.LENGTH_LONG);
+                Toast.makeText(this,"Please update current location",Toast.LENGTH_LONG).show();
             }
             else{
                 HashMap<String,String> h = new HashMap<String,String>();
-                h.put("pi",piId);
-                h.put("pi_port",Integer.toString(sp));
                 h.put("latitude",Double.toString(currentLoc.latitude));
                 h.put("longitude",Double.toString(currentLoc.longitude));
+                h.put("pi_port",Integer.toString(sp));
+                h.put("pi",piId);
                 registerSensor(h);
             }
         }
@@ -118,11 +124,31 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
-                locationBox.setText(place.getLatLng().toString());
+                LatLng coord = place.getLatLng();
+                locationBox.setText(Double.toString(coord.latitude) + ", " + Double.toString(coord.longitude));
                 currentLoc = place.getLatLng();
-                String toastMsg = String.format("Place: %s", place.getName());
-                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                // User chose the "Settings" item, show the app settings UI...
+                getJSON();
+                sAdapter.setSelectedPort(-1);
+                return true;
+
+            case R.id.action_portmap:
+                //TODO: Show portmap structure on press
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
         }
     }
 
@@ -131,18 +157,22 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
 
         List<SensorStatus> list = sAdapter.getList();
         list.clear();
-        JSONArray result = new JSONArray();
+        JSONArray result = null;
         try {
-            result = new JSONArray(jsonList);
-        }
-        catch (Exception e){
+            JSONObject obj = new JSONObject(jsonList);
+            result = obj.getJSONArray(Config.TAG_PORTLIST);
+        } catch (JSONException e) {
             e.printStackTrace();
+        }
+        if (result == null){
+            Toast.makeText(this,"Sensor list is empty",Toast.LENGTH_SHORT).show();
+            return;
         }
         try {
             for(int i = 0; i<result.length(); i++){
                 JSONObject jo = result.getJSONObject(i);
                 String port = jo.getString(Config.TAG_PORT);
-                boolean status = jo.getBoolean(Config.TAG_OCCUPIED);
+                boolean status = jo.getBoolean(Config.TAG_USED);
                 SensorStatus sst = new SensorStatus(port, status);
 //                Log.i(TAG,port + " " + status);
                 list.add(sst);
@@ -151,7 +181,7 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.i(TAG,"Notifying ViewPager, list size is " + list.size());
+        Log.i(TAG,"Notifying SensorArrayAdapter, list size is " + list.size());
         sAdapter.notifyDataSetChanged();
     }
 
