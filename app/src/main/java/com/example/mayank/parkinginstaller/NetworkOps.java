@@ -51,7 +51,7 @@ public class NetworkOps {
     //First argument is the URL of the script to which we will send the request
     //Other is an HashMap with name value pairs containing the data to be send with the request
     public Tuple sendPostRequest(String requestURL,
-                                  HashMap<String, String> postDataParams) {
+                                  HashMap<Object, Object> postDataParams) {
         //Creating a URL
         URL url;
         //StringBuilder object to store the message retrieved from the server
@@ -131,21 +131,20 @@ public class NetworkOps {
         return ans;
     }
 
-    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+    private String getPostDataString(HashMap<Object, Object> params) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();
         boolean first = true;
-        for (Map.Entry<String, String> entry : params.entrySet()) {
+        for (Map.Entry<Object, Object> entry : params.entrySet()) {
             if (first)
                 first = false;
             else
                 result.append("&");
 
-            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append(URLEncoder.encode(entry.getKey().toString(), "UTF-8"));
             result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            result.append(URLEncoder.encode(entry.getValue().toString(), "UTF-8"));
         }
 
         return result.toString();
     }
-
 }

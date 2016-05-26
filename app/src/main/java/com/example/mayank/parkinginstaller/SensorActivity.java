@@ -109,10 +109,10 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
                 Toast.makeText(this,"Please update current location",Toast.LENGTH_LONG).show();
             }
             else{
-                HashMap<String,String> h = new HashMap<String,String>();
-                h.put("latitude",Double.toString(currentLoc.latitude));
-                h.put("longitude",Double.toString(currentLoc.longitude));
-                h.put("pi_port",Integer.toString(sp));
+                HashMap<Object,Object> h = new HashMap<Object,Object>();
+                h.put("latitude",currentLoc.latitude);
+                h.put("longitude",currentLoc.longitude);
+                h.put("pi_port",sp);
                 h.put("pi",piId);
                 registerSensor(h);
             }
@@ -172,7 +172,7 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
             for(int i = 0; i<result.length(); i++){
                 JSONObject jo = result.getJSONObject(i);
                 String port = jo.getString(Config.TAG_PORT);
-                boolean status = jo.getBoolean(Config.TAG_USED);
+                boolean status = !jo.getBoolean(Config.TAG_USED);
                 SensorStatus sst = new SensorStatus(port, status);
 //                Log.i(TAG,port + " " + status);
                 list.add(sst);
@@ -225,13 +225,13 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
         gj.execute();
     }
 
-    private void registerSensor(HashMap<String,String> params){
+    private void registerSensor(HashMap<Object,Object> params){
         class mapPhone extends AsyncTask<Void,Void,String> {
             boolean callPhoneMap;
             ProgressDialog loading;
-            HashMap<String,String> params;
+            HashMap<Object,Object> params;
 
-            public mapPhone(HashMap<String,String> h){
+            public mapPhone(HashMap<Object,Object> h){
                 this.params = h;
             }
 

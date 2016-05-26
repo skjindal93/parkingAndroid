@@ -60,7 +60,7 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
         }else if (v.getId() == R.id.proceed){
             if (piId != null){
                 String MAC = getMacAddress();
-                HashMap<String,String> h = new HashMap<String,String>();
+                HashMap<Object,Object> h = new HashMap<Object,Object>();
                 h.put("pi",piId);
                 h.put("phone_mac",MAC);
                 Log.i(TAG,"Proceed pressed");
@@ -95,13 +95,13 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
     }
 
 
-    private void mapPhone(HashMap<String,String> params){
+    private void mapPhone(HashMap<Object,Object> params){
         class mapPhone extends AsyncTask<Void,Void,String> {
             boolean callPhoneMap;
             ProgressDialog loading;
-            HashMap<String,String> params;
+            HashMap<Object,Object> params;
 
-            public mapPhone(HashMap<String,String> h){
+            public mapPhone(HashMap<Object,Object> h){
                 this.params = h;
             }
 
