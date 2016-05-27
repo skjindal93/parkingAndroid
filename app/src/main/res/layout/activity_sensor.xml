@@ -22,14 +22,26 @@
             android:text="Working with Raspberry Pi "
             android:id="@+id/piName" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-            android:text="Current Occupancy"
-            android:id="@+id/textView3"
-            android:layout_margin="4dp" />
+            android:orientation="horizontal"
+            android:layout_margin="4dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:text="Current Occupancy"
+                android:id="@+id/textView3" />
 
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Testing Mode"
+                android:id="@+id/testingMode"
+                android:layout_gravity="right" />
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"

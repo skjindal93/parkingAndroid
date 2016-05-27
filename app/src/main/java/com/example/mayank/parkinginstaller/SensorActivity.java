@@ -14,8 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,8 +45,10 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
     TextView locationBox;
     Button getLoc;
     Button addSensor;
+    Switch testingMode;
     int PLACE_PICKER_REQUEST = 1;
     LatLng currentLoc;
+    boolean inTestingMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,23 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
         locationBox = (TextView)findViewById(R.id.locationBox);
         getLoc.setOnClickListener(this);
         addSensor.setOnClickListener(this);
+        testingMode = (Switch)findViewById(R.id.testingMode);
+        inTestingMode = false;
+        testingMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sAdapter.setSelectedPort(-1);
+                sAdapter.notifyDataSetChanged();
+                if (isChecked) {
+                    // The toggle is enabled
+                    inTestingMode = true;
+                } else {
+                    // The toggle is disabled
+                    inTestingMode = false;
+                }
+            }
+        });
+
+
         sensors = new ArrayList<>();
         currentLoc = null;
         sAdapter = new SensorArrayAdapter(this, sensors);
@@ -78,13 +99,25 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
     @Override
     public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
         SensorStatus sst = sAdapter.getItem(position);
-        Log.i(TAG,"heheee  " + sst.status);
-        if (sst.status){
-            int sp = Integer.parseInt(sst.sensorName);
-            sAdapter.setSelectedPort(sp);
-            sAdapter.notifyDataSetChanged();
-            //v.setBackgroundColor(getResources().getColor(R.color.pressed_color));
+        if (inTestingMode){
+            if (!sst.status){
+                int sp = Integer.parseInt(sst.sensorName);
+                Intent myIntent = new Intent(SensorActivity.this, SensorDetailActivity.class);
+                myIntent.putExtra("piId", piId); //Raspberry Pi ID
+                Log.i(TAG,"-------- " + sp);
+                myIntent.putExtra("piPort",sp);
+                SensorActivity.this.startActivity(myIntent);
+            }
         }
+        else {
+            if (sst.status) {
+                int sp = Integer.parseInt(sst.sensorName);
+                sAdapter.setSelectedPort(sp);
+                sAdapter.notifyDataSetChanged();
+                //v.setBackgroundColor(getResources().getColor(R.color.pressed_color));
+            }
+        }
+
     }
 
     public void onClick(View v){
