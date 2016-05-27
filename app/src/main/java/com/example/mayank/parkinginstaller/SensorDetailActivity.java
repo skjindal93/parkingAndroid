@@ -33,7 +33,7 @@ public class SensorDetailActivity extends AppCompatActivity {
         piId = Integer.parseInt(intent.getStringExtra("piId"));
         piPort = intent.getIntExtra("piPort",-1);
         sensorDetail = (TextView)findViewById(R.id.sensorDetail);
-        sensorDetail.setText(generateText(piId,piPort,89.99,99.99,true));
+        getJSON();
 
     }
 
@@ -71,7 +71,19 @@ public class SensorDetailActivity extends AppCompatActivity {
     }
 
     private void showSensors(String jsonList){
-//        sensorDetail.setText(generateText(piId,piPort,lati,longi,occupied));
+
+        String jo = jsonList.substring(1,jsonList.length()-1);
+        try {
+            JSONObject obj = new JSONObject(jo);
+            double lati = obj.getDouble("latitude");
+            double longi = obj.getDouble("longitude");
+            boolean occupied = obj.getBoolean("occupied");
+            sensorDetail.setText(generateText(piId,piPort,lati,longi,occupied));
+
+        } catch (JSONException e) {
+            sensorDetail.setText("Error Occurred! Press refresh");
+            e.printStackTrace();
+        }
 
     }
 
@@ -102,7 +114,7 @@ public class SensorDetailActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... params) {
                 NetworkOps rh = new NetworkOps();
-                String s = rh.sendGetRequest(Config.URL_SENSOR_PI + "?pi=" + piId + "&pi_port=" + piPort);  /// TODO: UPDATE URL
+                String s = rh.sendGetRequest(Config.URL_SENSOR_DETAIL + piId + "/" + piPort + "/");  /// TODO: UPDATE URL
                 showSensorDetail = true;
                 if (s == "timeout" || s == "error"){
                     showSensorDetail= false;

@@ -79,9 +79,13 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
                 if (isChecked) {
                     // The toggle is enabled
                     inTestingMode = true;
+                    getLoc.setEnabled(false);
+                    addSensor.setEnabled(false);
                 } else {
                     // The toggle is disabled
                     inTestingMode = false;
+                    getLoc.setEnabled(true);
+                    addSensor.setEnabled(true);
                 }
             }
         });
