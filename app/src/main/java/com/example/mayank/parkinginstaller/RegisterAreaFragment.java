@@ -84,7 +84,12 @@ public class RegisterAreaFragment extends Fragment implements View.OnClickListen
 
     public void onClick(View view){
         if (view.getId() == R.id.existingArea){
-            ((DaddyAreaActivity)getActivity()).showExistingAreaFragment();
+            if (isDaddyArea) {
+                ((DaddyAreaActivity) getActivity()).showExistingAreaFragment();
+            }
+            else{
+                ((ParkingAreaActivity) getActivity()).showExistingAreaFragment();
+            }
         }
         else if (view.getId() == R.id.registerChooseLoc){
             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();

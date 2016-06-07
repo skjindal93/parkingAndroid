@@ -11,6 +11,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -31,19 +34,60 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
     TextView detailsHeading;
     String TAG = "QRActivity";
     String piId = null;
+    RegionInfo regionInfo;
+    RegionInfo areaInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr);
+        Intent intent = getIntent();
+        regionInfo = new RegionInfo(intent.getStringExtra("regionName"),intent.getIntExtra("regionId",-1));
+        areaInfo = new RegionInfo(intent.getStringExtra("areaName"),intent.getIntExtra("areaId",-1));
         ImageButton qr = (ImageButton)findViewById(R.id.imageButton);
         Button proceed = (Button)findViewById(R.id.proceed);
         detailsHeading = (TextView)findViewById(R.id.textView2);
         details = (TextView)findViewById(R.id.details);
-
+        detailsBoxMsg(piId);
+        setTitle("Raspberry Pi Scan");
         qr.setOnClickListener(this);
         proceed.setOnClickListener(this);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.qr_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_cancel:
+                // User chose the "Settings" item, show the app settings UI...
+                Intent intent = new Intent(QRActivity.this,DaddyAreaActivity.class);
+                QRActivity.this.startActivity(intent);
+                this.finish();
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void detailsBoxMsg(String piId){
+        details.setText("Region Name: " + regionInfo.name + "\n");
+        details.append("Area Name: " + areaInfo.name + "\n");
+        if (piId == null){
+            details.append("Press QR to scan get R-pi ID");
+        }
+        else{
+            details.append("Raspberry Pi Id: " + piId);
+        }
     }
 
     public void onClick(View v){
@@ -79,8 +123,8 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 String contents = data.getStringExtra("SCAN_RESULT");
-                details.setText("Id of scanned R-pi: " + contents);
                 piId = contents;
+                detailsBoxMsg(piId);
             }
             if(resultCode == RESULT_CANCELED){
                 //handle cancel

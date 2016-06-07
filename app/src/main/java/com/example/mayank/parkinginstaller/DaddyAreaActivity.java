@@ -216,10 +216,18 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                 else{
                     RegionInfo regionInfo = regionInfos.get(index);
                     Toast.makeText(this, regionInfo.name + " Region selected",Toast.LENGTH_LONG).show();
+                    Intent myIntent = new Intent(DaddyAreaActivity.this, ParkingAreaActivity.class);
+                    myIntent.putExtra("regionId", regionInfo.id);
+                    myIntent.putExtra("regionName", regionInfo.name);
+                    DaddyAreaActivity.this.startActivity(myIntent);
                 }
             }
             else{
                 RegisterAreaFragment rFragment = (RegisterAreaFragment) getSupportFragmentManager().findFragmentByTag(TAG_REGISTER);
+                if (rFragment == null){
+                    Toast.makeText(this,"Please Select an Area", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 View view = rFragment.getView();
                 EditText editText = (EditText)view.findViewById(R.id.registerName);
                 String name = editText.getText().toString();
@@ -264,11 +272,11 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                 super.onPostExecute(s);
                 loading.dismiss();
                 if (callPhoneMap) {
-//                    Intent myIntent = new Intent(DaddyAreaActivity.this, SensorActivity.class);
-
-//                    myIntent.putExtra("piId", piId); //Raspberry Pi ID
-//                    DaddyAreaActivity.this.startActivity(myIntent);
                     Toast.makeText(getApplicationContext(), "Registered.", Toast.LENGTH_LONG).show();
+                    Intent myIntent = new Intent(DaddyAreaActivity.this, ParkingAreaActivity.class);
+                    myIntent.putExtra("regionId", s);
+                    myIntent.putExtra("regionName",params.get("name").toString());
+                    DaddyAreaActivity.this.startActivity(myIntent);
                 }else{
                     Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
                 }

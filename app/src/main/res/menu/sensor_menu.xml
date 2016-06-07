@@ -11,6 +11,6 @@
         android:id="@+id/action_portmap"
         android:icon="@drawable/ic_view_comfy_white_48dp"
         android:title="PortMap"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
 </menu>

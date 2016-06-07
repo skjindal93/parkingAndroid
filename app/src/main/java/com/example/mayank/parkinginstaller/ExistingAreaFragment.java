@@ -116,7 +116,12 @@ public class ExistingAreaFragment extends Fragment implements View.OnClickListen
 
     public void onClick(View view){
         if (view.getId() == R.id.registerNewArea){
-            ((DaddyAreaActivity)getActivity()).showRegisterAreaFragment();
+            if (isDaddyArea) {
+                ((DaddyAreaActivity) getActivity()).showRegisterAreaFragment();
+            }
+            else{
+                ((ParkingAreaActivity)getActivity()).showRegisterAreaFragment();
+            }
         }
     }
 
