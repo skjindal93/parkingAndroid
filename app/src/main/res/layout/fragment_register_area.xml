@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Register New Area"
+            android:text="Register New Area:"
             android:id="@+id/textView7" />
 
         <EditText

@@ -2,6 +2,7 @@ package com.example.mayank.parkinginstaller;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -36,6 +37,7 @@ public class RegisterAreaFragment extends Fragment implements View.OnClickListen
     private boolean isDaddyArea;
     int PLACE_PICKER_REQUEST = 2;
     EditText registerLatiLongi = null;
+    LatLng chosenLocation;
 
     private OnFragmentInteractionListener mListener;
 
@@ -102,10 +104,14 @@ public class RegisterAreaFragment extends Fragment implements View.OnClickListen
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == getActivity().RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, getActivity());
-                LatLng coord = place.getLatLng();
-                registerLatiLongi.setText(Double.toString(coord.latitude) + ", " + Double.toString(coord.longitude));
+                chosenLocation = place.getLatLng();
+                registerLatiLongi.setText("Latitude, Longitude: " + Config.round(chosenLocation.latitude,2) + ", " + Config.round(chosenLocation.longitude,2));
             }
         }
+    }
+
+    public LatLng getChosenLocation(){
+        return this.chosenLocation;
     }
 
     @Override

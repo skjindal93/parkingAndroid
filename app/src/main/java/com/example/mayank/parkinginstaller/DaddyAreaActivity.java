@@ -1,6 +1,7 @@
 package com.example.mayank.parkinginstaller;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,14 +16,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DaddyAreaActivity extends AppCompatActivity implements ExistingAreaFragment.OnFragmentInteractionListener
@@ -215,9 +220,73 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
             }
             else{
                 RegisterAreaFragment rFragment = (RegisterAreaFragment) getSupportFragmentManager().findFragmentByTag(TAG_REGISTER);
-
+                View view = rFragment.getView();
+                EditText editText = (EditText)view.findViewById(R.id.registerName);
+                String name = editText.getText().toString();
+                LatLng loc = rFragment.getChosenLocation();
+                if (name.length() == 0){
+                    Toast.makeText(this,"Please Enter a name for new area",Toast.LENGTH_LONG).show();
+                }
+                else if (loc == null){
+                    Toast.makeText(this,"Please choose location for new area",Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(this,"Registering On Server",Toast.LENGTH_LONG).show();
+                    HashMap<Object,Object> hashMap = new HashMap<>();
+                    hashMap.put("name",name);
+                    hashMap.put("latitude",loc.latitude);
+                    hashMap.put("longitude",loc.longitude);
+                    mapPhone(hashMap);
+                }
             }
         }
+    }
+
+    private void mapPhone(HashMap<Object,Object> params){
+        class mapPhone extends AsyncTask<Void,Void,String> {
+            boolean callPhoneMap;
+            ProgressDialog loading;
+            HashMap<Object,Object> params;
+
+            public mapPhone(HashMap<Object,Object> h){
+                this.params = h;
+            }
+
+            @Override
+            protected void onPreExecute() {
+                Log.i(TAG,"pre Execute");
+                super.onPreExecute();
+                loading = ProgressDialog.show(DaddyAreaActivity.this,"Updating Server","Wait...",false,false);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                loading.dismiss();
+                if (callPhoneMap) {
+//                    Intent myIntent = new Intent(DaddyAreaActivity.this, SensorActivity.class);
+
+//                    myIntent.putExtra("piId", piId); //Raspberry Pi ID
+//                    DaddyAreaActivity.this.startActivity(myIntent);
+                    Toast.makeText(getApplicationContext(), "Registered.", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            protected String doInBackground(Void... p) {
+                NetworkOps rh = new NetworkOps();
+                Tuple tup = rh.sendPostRequest(Config.URL_REGISTER_REGION, params);
+                callPhoneMap = false;
+                if (tup.getResponseCode() == 201){
+                    callPhoneMap = true;
+                }
+                return tup.response;
+            }
+        }
+        mapPhone mp = new mapPhone(params);
+        mp.execute();
     }
 
 }
