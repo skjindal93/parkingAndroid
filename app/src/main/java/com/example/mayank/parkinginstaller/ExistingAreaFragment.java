@@ -9,12 +9,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class RegionInfo implements Parcelable{
     String name;
@@ -68,11 +71,11 @@ public class ExistingAreaFragment extends Fragment implements View.OnClickListen
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "isDaddyArea";
-    private static final String ARG_PARAM2 = "names";
+    private static final String ARG_PARAM2 = "regionInfoList";
 
 
     private boolean isDaddyArea;
-    ArrayList<String> names;
+    ArrayList<RegionInfo> regionInfoList;
     AutoCompleteTextView daddyNameSearch = null;
 
 
@@ -90,11 +93,11 @@ public class ExistingAreaFragment extends Fragment implements View.OnClickListen
      * @return A new instance of fragment ExistingAreaFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ExistingAreaFragment newInstance(boolean param1, ArrayList<String> names) {
+    public static ExistingAreaFragment newInstance(boolean param1, ArrayList<RegionInfo> regionInfoList) {
         ExistingAreaFragment fragment = new ExistingAreaFragment();
         Bundle args = new Bundle();
         args.putBoolean(ARG_PARAM1, param1);
-        args.putStringArrayList(ARG_PARAM2,names);
+        args.putParcelableArrayList(ARG_PARAM2,regionInfoList);
         fragment.setArguments(args);
         return fragment;
     }
@@ -104,7 +107,7 @@ public class ExistingAreaFragment extends Fragment implements View.OnClickListen
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             isDaddyArea = getArguments().getBoolean(ARG_PARAM1);
-            names = getArguments().getStringArrayList(ARG_PARAM2);
+            regionInfoList = getArguments().getParcelableArrayList(ARG_PARAM2);
         }
         else{
             Toast.makeText(getActivity(),"Arguments null, error!", Toast.LENGTH_LONG).show();
@@ -126,10 +129,17 @@ public class ExistingAreaFragment extends Fragment implements View.OnClickListen
         registerNewArea.setOnClickListener(this);
         daddyNameSearch = (AutoCompleteTextView)view.findViewById(R.id.daddyNameSearch);
 
-        ArrayAdapter adapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1,names.toArray(new String[names.size()]));
+        CustomAdaptor adapter = new CustomAdaptor(getActivity(),R.layout.region_list_item,regionInfoList);
 
         daddyNameSearch.setAdapter(adapter);
         daddyNameSearch.setThreshold(1);
+        daddyNameSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                in.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+            }
+        });
         return view;
     }
 

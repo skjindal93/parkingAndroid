@@ -13,7 +13,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -30,7 +32,7 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
     String TAG_EXISTING = "Existing";
     String TAG_REGISTER = "Register";
     Location currentLocation;
-    ArrayList<String> names;
+    ArrayList<RegionInfo> regionInfos;
     Button proceed;
     String TAG = "DaddyAreaActivity";
 
@@ -38,10 +40,10 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daddy_area);
-        names = new ArrayList<String>();
+        regionInfos = new ArrayList<RegionInfo>();
         proceed = (Button)findViewById(R.id.proceedDaddyArea);
         proceed.setOnClickListener(this);
-        setTitle("Daddy Parking Area");
+        setTitle("Parking Region");
         setupLocation();
     }
 
@@ -70,7 +72,7 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
 
     private void updateAreaList(String jsonList){
 
-        names.clear();
+        regionInfos.clear();
         JSONArray result = null;
         try {
             JSONObject obj = new JSONObject(jsonList);
@@ -86,13 +88,14 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
             for(int i = 0; i<result.length(); i++){
                 JSONObject jo = result.getJSONObject(i);
                 String areaName = jo.getString(Config.TAG_REGION_NAME);
-                names.add(areaName);
+                int id = jo.getInt(Config.TAG_REGION_ID);
+                regionInfos.add(new RegionInfo(areaName, id));
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        getSupportFragmentManager().beginTransaction().replace(R.id.daddyContent, ExistingAreaFragment.newInstance(true,names),TAG_EXISTING).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.daddyContent, ExistingAreaFragment.newInstance(true,regionInfos),TAG_EXISTING).commit();
     }
 
 
@@ -176,7 +179,7 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
     }
 
     public void showExistingAreaFragment(){
-        Fragment fragment = ExistingAreaFragment.newInstance(true,names);
+        Fragment fragment = ExistingAreaFragment.newInstance(true,regionInfos);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.daddyContent, fragment,TAG_EXISTING)
@@ -191,7 +194,24 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
             ExistingAreaFragment eFragment = (ExistingAreaFragment) getSupportFragmentManager().findFragmentByTag(TAG_EXISTING);
             if (eFragment != null && eFragment.isVisible()) {
                 // add your code here
-
+                View view = eFragment.getView();
+                AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.daddyNameSearch);
+                String regionName = autoCompleteTextView.getText().toString();
+                Log.i(TAG,"region " + regionName);
+                int index = -1;
+                for (int i = 0; i < regionInfos.size(); i++){
+                    if (regionInfos.get(i).name.equals(regionName)){
+                        index = i;
+                        break;
+                    }
+                }
+                if (index == -1){
+                    Toast.makeText(this,"Please select a valid position",Toast.LENGTH_LONG).show();
+                }
+                else{
+                    RegionInfo regionInfo = regionInfos.get(index);
+                    Toast.makeText(this, regionInfo.name + " Region selected",Toast.LENGTH_LONG).show();
+                }
             }
             else{
                 RegisterAreaFragment rFragment = (RegisterAreaFragment) getSupportFragmentManager().findFragmentByTag(TAG_REGISTER);

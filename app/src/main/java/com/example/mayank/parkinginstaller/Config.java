@@ -14,6 +14,7 @@ public class Config {
     public static String TAG_PORTLIST = "ports";
     public static String TAG_REGIONS = "regions";
     public static String TAG_REGION_NAME = "name";
+    public static String TAG_REGION_ID = "id";
     public static String TAG_PORT = "pi_port";
     public static String TAG_USED = "used";
 
