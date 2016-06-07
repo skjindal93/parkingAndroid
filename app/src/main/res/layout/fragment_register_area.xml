@@ -1,0 +1,77 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterAreaFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Register New Area"
+            android:id="@+id/textView7" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:hint="Area name"
+            android:id="@+id/registerName" />
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" Choose Location"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:drawableStart="@drawable/ic_near_me_black_24dp"
+            android:drawableLeft="@drawable/ic_near_me_black_24dp"
+            android:background="@color/transparent"
+            android:textColor="@android:color/black"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/registerChooseLoc" />
+
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:id="@+id/registerLatiLongi"
+            android:hint="Pick Location using button above"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="----- OR ------"
+            android:textColor="@color/colorPrimaryDark"
+            android:id="@+id/textView6"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" Use Existing Area"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:drawableStart="@drawable/ic_arrow_back_black_24dp"
+            android:drawableLeft="@drawable/ic_arrow_back_black_24dp"
+            android:background="@color/transparent"
+            android:textColor="@android:color/black"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/existingArea" />
+    </LinearLayout>
+
+</RelativeLayout>
