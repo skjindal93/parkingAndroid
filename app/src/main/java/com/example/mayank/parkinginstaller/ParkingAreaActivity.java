@@ -45,6 +45,7 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_parking_area);
         Intent intent = getIntent();
         regionIdSelected = intent.getIntExtra("regionId",0);
+        Log.i(TAG,"iddddddddddddddddddddddddddddddd  "+regionIdSelected);
         regionNameSelected = intent.getStringExtra("regionName");
         proceed = (Button)findViewById(R.id.proceedArea);
         proceed.setOnClickListener(this);
@@ -100,14 +101,25 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
                     Toast.makeText(this,"Please choose location for new area",Toast.LENGTH_LONG).show();
                 }
                 else{
-                    Toast.makeText(this,"Registering On Server",Toast.LENGTH_LONG).show();
                     HashMap<Object,Object> hashMap = new HashMap<>();
                     hashMap.put("name",name);
                     hashMap.put("latitude",loc.latitude);
                     hashMap.put("longitude",loc.longitude);
+                    hashMap.put("region",regionIdSelected);
+
                     mapPhone(hashMap);
                 }
             }
+        }
+    }
+
+    public JSONObject processResponse(String s){
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+            return jsonObject;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -139,8 +151,7 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
         regionInfos.clear();
         JSONArray result = null;
         try {
-            JSONObject obj = new JSONObject(jsonList);
-            result = obj.getJSONArray(Config.TAG_REGIONS);
+            result = new JSONArray(jsonList);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -150,7 +161,7 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
         }
         try {
             for(int i = 0; i<result.length(); i++){
-                JSONObject jo = result.getJSONObject(i);
+                JSONObject jo = result.getJSONObject(i).getJSONObject(Config.TAG_AREA);
                 String areaName = jo.getString(Config.TAG_REGION_NAME);
                 int id = jo.getInt(Config.TAG_REGION_ID);
                 regionInfos.add(new RegionInfo(areaName, id));
@@ -189,7 +200,7 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
             @Override
             protected String doInBackground(Void... params) {
                 NetworkOps rh = new NetworkOps();
-                String s = rh.sendGetRequest(Config.URL_LIST_REGIONS);
+                String s = rh.sendGetRequest(Config.URL_LIST_AREA + regionIdSelected);
                 callupdateAreaList = true;
                 if (s == "timeout" || s == "error"){
                     callupdateAreaList= false;
@@ -204,6 +215,7 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
     private void mapPhone(HashMap<Object,Object> params){
         class mapPhone extends AsyncTask<Void,Void,String> {
             boolean callPhoneMap;
+            boolean showServerResp;
             ProgressDialog loading;
             HashMap<Object,Object> params;
 
@@ -225,12 +237,25 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
                 if (callPhoneMap) {
                     Toast.makeText(getApplicationContext(), "Registered.", Toast.LENGTH_LONG).show();
                     Intent myIntent = new Intent(ParkingAreaActivity.this, QRActivity.class);
+                    JSONObject jsonObject = processResponse(s);
+                    if (jsonObject == null){
+                        Toast.makeText(ParkingAreaActivity.this, "Invalid response from server", Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     myIntent.putExtra("regionName",regionNameSelected);
                     myIntent.putExtra("regionId",regionIdSelected);
-                    myIntent.putExtra("areaId", s);
+                    try {
+                        myIntent.putExtra("areaId", Integer.parseInt(jsonObject.getString("id")));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     myIntent.putExtra("areaName",params.get("name").toString());
                     ParkingAreaActivity.this.startActivity(myIntent);
-                }else{
+                }
+                else if (showServerResp){
+                    Toast.makeText(ParkingAreaActivity.this,s,Toast.LENGTH_LONG ).show();
+                }
+                else{
                     Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
                 }
             }
@@ -238,10 +263,14 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
             @Override
             protected String doInBackground(Void... p) {
                 NetworkOps rh = new NetworkOps();
-                Tuple tup = rh.sendPostRequest(Config.URL_REGISTER_REGION, params);
+                Tuple tup = rh.sendPostRequest(Config.URL_REGISTER_AREA, params);
                 callPhoneMap = false;
+                showServerResp = false;
                 if (tup.getResponseCode() == 201){
                     callPhoneMap = true;
+                }
+                else if (tup.getResponseCode() == 400){
+                    showServerResp = false;
                 }
                 return tup.response;
             }
@@ -249,6 +278,7 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
         mapPhone mp = new mapPhone(params);
         mp.execute();
     }
+
 
     public void showRegisterAreaFragment(){
         Fragment fragment = RegisterAreaFragment.newInstance(false);

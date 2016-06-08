@@ -239,7 +239,6 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                     Toast.makeText(this,"Please choose location for new area",Toast.LENGTH_LONG).show();
                 }
                 else{
-                    Toast.makeText(this,"Registering On Server",Toast.LENGTH_LONG).show();
                     HashMap<Object,Object> hashMap = new HashMap<>();
                     hashMap.put("name",name);
                     hashMap.put("latitude",loc.latitude);
@@ -253,6 +252,7 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
     private void mapPhone(HashMap<Object,Object> params){
         class mapPhone extends AsyncTask<Void,Void,String> {
             boolean callPhoneMap;
+            boolean showServerResp;
             ProgressDialog loading;
             HashMap<Object,Object> params;
 
@@ -274,10 +274,23 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                 if (callPhoneMap) {
                     Toast.makeText(getApplicationContext(), "Registered.", Toast.LENGTH_LONG).show();
                     Intent myIntent = new Intent(DaddyAreaActivity.this, ParkingAreaActivity.class);
-                    myIntent.putExtra("regionId", s);
+                    JSONObject jsonObject = processResponse(s);
+                    if (jsonObject == null){
+                        Toast.makeText(DaddyAreaActivity.this,"Invalid response from server",Toast.LENGTH_LONG);
+                        return;
+                    }
+                    try {
+                        myIntent.putExtra("regionId", Integer.parseInt(jsonObject.getString("id")));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     myIntent.putExtra("regionName",params.get("name").toString());
                     DaddyAreaActivity.this.startActivity(myIntent);
-                }else{
+                }
+                else if (showServerResp){
+                    Toast.makeText(DaddyAreaActivity.this,s,Toast.LENGTH_LONG ).show();
+                }
+                else{
                     Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
                 }
             }
@@ -287,14 +300,28 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                 NetworkOps rh = new NetworkOps();
                 Tuple tup = rh.sendPostRequest(Config.URL_REGISTER_REGION, params);
                 callPhoneMap = false;
+                showServerResp = false;
                 if (tup.getResponseCode() == 201){
                     callPhoneMap = true;
+                }
+                else if (tup.getResponseCode() == 400){
+                    showServerResp = true;
                 }
                 return tup.response;
             }
         }
         mapPhone mp = new mapPhone(params);
         mp.execute();
+    }
+
+    public JSONObject processResponse(String s){
+        try {
+            JSONObject jsonObject = new JSONObject(s);
+            return jsonObject;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

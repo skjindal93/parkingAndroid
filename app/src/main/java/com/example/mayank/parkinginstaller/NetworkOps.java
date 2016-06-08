@@ -16,7 +16,9 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -53,6 +55,14 @@ public class NetworkOps {
     public Tuple sendPostRequest(String requestURL,
                                   HashMap<Object, Object> postDataParams) {
         //Creating a URL
+        String logString = "POST Input: ";
+        Set s = postDataParams.keySet();
+        Iterator iter = s.iterator();
+        while (iter.hasNext()){
+            Object object = iter.next();
+            logString += object.toString() +": " + postDataParams.get(object) + ", " ;
+        }
+        Log.i(TAG,logString);
         URL url;
         //StringBuilder object to store the message retrieved from the server
         StringBuilder sb = new StringBuilder();
@@ -91,9 +101,11 @@ public class NetworkOps {
             while ((response = br.readLine()) != null){
                 sb.append(response);
             }
+            Log.i(TAG,"POST Output: " + sb.toString());
             tup = new Tuple(responseCode,sb.toString());
 
         } catch (Exception e) {
+            Log.i(TAG,"POST Output: " + sb.toString());
             e.printStackTrace();
             tup = new Tuple(404,"Timeout");
         }

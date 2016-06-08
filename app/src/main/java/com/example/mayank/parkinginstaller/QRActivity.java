@@ -107,6 +107,7 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
                 HashMap<Object,Object> h = new HashMap<Object,Object>();
                 h.put("pi",piId);
                 h.put("phone_mac",MAC);
+                h.put("area",areaInfo.id);
                 Log.i(TAG,"Proceed pressed");
                 mapPhone(h);
             }

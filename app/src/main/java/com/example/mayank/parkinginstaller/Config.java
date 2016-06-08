@@ -11,12 +11,15 @@ public class Config {
 
     public static String api_phoneMap = server + "installation/raspberryPhoneMap/";
     public static String URL_NEW_SENSOR = server + "installation/newSensor/";
-    public static String URL_REGISTER_REGION = server + "parking/registerRegion/";
-    public static String URL_SENSOR_PI = server + "parking/sensorPorts/";
-    public static String URL_SENSOR_DETAIL = server + "parking/sensorDetail/";
-    public static String URL_LIST_REGIONS = server + "parking/regions/";
+    public static String URL_REGISTER_REGION = server + "installation/registerRegion/";
+    public static String URL_REGISTER_AREA = server + "installation/registerArea/";
+    public static String URL_SENSOR_PI = server + "installation/sensorPorts/";
+    public static String URL_SENSOR_DETAIL = server + "installation/sensorDetail/";
+    public static String URL_LIST_REGIONS = server + "installation/regions/";
+    public static String URL_LIST_AREA = server + "installation/areasInRegion/";
     public static String TAG_PORTLIST = "ports";
     public static String TAG_REGIONS = "regions";
+    public static String TAG_AREA = "area";
     public static String TAG_REGION_NAME = "name";
     public static String TAG_REGION_ID = "id";
     public static String TAG_PORT = "pi_port";
