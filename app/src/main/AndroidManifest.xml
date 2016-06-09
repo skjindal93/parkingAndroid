@@ -27,7 +27,8 @@
         <activity android:name=".SensorActivity" />
         <activity android:name=".SensorDetailActivity" />
         <activity android:name=".QRActivity" />
-        <activity android:name=".ParkingAreaActivity"></activity>
+        <activity android:name=".ParkingAreaActivity" />
+        <activity android:name=".SensorQRActivity"></activity>
     </application>
 
 </manifest>

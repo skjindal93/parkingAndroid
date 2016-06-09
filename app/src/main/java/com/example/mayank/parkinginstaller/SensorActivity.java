@@ -156,12 +156,13 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
                 Toast.makeText(this,"Please update current location",Toast.LENGTH_LONG).show();
             }
             else{
-                HashMap<Object,Object> h = new HashMap<Object,Object>();
-                h.put("latitude",currentLoc.latitude);
-                h.put("longitude",currentLoc.longitude);
-                h.put("pi_port",sp);
-                h.put("pi",piId);
-                registerSensor(h);
+                Intent intent = new Intent(SensorActivity.this,SensorQRActivity.class);
+                intent.putExtra("latitude",currentLoc.latitude);
+                intent.putExtra("longitude",currentLoc.longitude);
+                intent.putExtra("pi_port",sp);
+                intent.putExtra("pi",piId);
+                SensorActivity.this.startActivity(intent);
+                finish();
             }
         }
 
@@ -172,7 +173,7 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
                 LatLng coord = place.getLatLng();
-                locationBox.setText(Double.toString(coord.latitude) + ", " + Double.toString(coord.longitude));
+                locationBox.setText("Lat, Long: " + Config.round(coord.latitude,2) + ", " + Config.round(coord.longitude,2));
                 currentLoc = place.getLatLng();
             }
         }
@@ -273,7 +274,7 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
                     Log.i(TAG, s);
                     showSensors(s);
                 }else{
-                    Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -282,7 +283,7 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
                 NetworkOps rh = new NetworkOps();
                 String s = rh.sendGetRequest(Config.URL_SENSOR_PI + "?pi=" + 1);  /// TODO: REMOVE HARDCODED PI ID
                 callShowSensors = true;
-                if (s == "timeout" || s == "error"){
+                if (s == "timeout" || s == "error" || s.startsWith("error: ")){
                     callShowSensors= false;
                 }
                 return s;
@@ -292,47 +293,5 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
         gj.execute();
     }
 
-    private void registerSensor(HashMap<Object,Object> params){
-        class mapPhone extends AsyncTask<Void,Void,String> {
-            boolean callPhoneMap;
-            ProgressDialog loading;
-            HashMap<Object,Object> params;
-
-            public mapPhone(HashMap<Object,Object> h){
-                this.params = h;
-            }
-
-            @Override
-            protected void onPreExecute() {
-                Log.i(TAG,"pre Execute");
-                super.onPreExecute();
-                loading = ProgressDialog.show(SensorActivity.this,"Updating Server","Wait...",false,false);
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-                loading.dismiss();
-                if (callPhoneMap) {
-                    Toast.makeText(getApplicationContext(), "Response: " + s, Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            protected String doInBackground(Void... p) {
-                NetworkOps rh = new NetworkOps();
-                Tuple tup = rh.sendPostRequest(Config.URL_NEW_SENSOR, params);
-                callPhoneMap = false;
-                if (tup.getResponseCode() == 201){
-                    callPhoneMap = true;
-                }
-                return tup.response;
-            }
-        }
-        mapPhone mp = new mapPhone(params);
-        mp.execute();
-    }
 
 }

@@ -68,6 +68,7 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
             case R.id.action_cancel:
                 // User chose the "Settings" item, show the app settings UI...
                 Intent intent = new Intent(QRActivity.this,DaddyAreaActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 QRActivity.this.startActivity(intent);
                 this.finish();
                 return true;
@@ -166,7 +167,7 @@ public class QRActivity extends AppCompatActivity implements View.OnClickListene
                     myIntent.putExtra("piId", piId); //Raspberry Pi ID
                     QRActivity.this.startActivity(myIntent);
                 }else{
-                    Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Error: " + s, Toast.LENGTH_LONG).show();
                 }
             }
 

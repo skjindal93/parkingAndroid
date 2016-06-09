@@ -83,11 +83,11 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:text=" Get Location "
+                android:drawableLeft="@drawable/ic_near_me_black_24dp"
+                android:text=" Location "
                 android:clickable="true"
-                android:background="@color/colorPrimary"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:textColor="@android:color/white"
+                android:background="@drawable/my_button_white"
+                android:textColor="@android:color/black"
                 android:id="@+id/getLocation" />
 
         </LinearLayout>
@@ -99,7 +99,7 @@
         android:clickable="true"
         android:background="@color/colorPrimary"
         android:textColor="@android:color/white"
-        android:text="Update"
+        android:text="Proceed"
         android:id="@+id/addSensor" />
 
 </LinearLayout>

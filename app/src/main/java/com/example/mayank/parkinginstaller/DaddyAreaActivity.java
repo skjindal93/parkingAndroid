@@ -165,7 +165,7 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                 String s = rh.sendGetRequest(Config.URL_LIST_REGIONS +
                         "?latitude=" + currentLocation.getLongitude() + "&longitude=" + currentLocation.getLongitude());
                 callupdateAreaList = true;
-                if (s == "timeout" || s == "error"){
+                if (s == "timeout" || s == "error" || s.startsWith("error:")){
                     callupdateAreaList= false;
                 }
                 return s;
@@ -287,11 +287,8 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                     myIntent.putExtra("regionName",params.get("name").toString());
                     DaddyAreaActivity.this.startActivity(myIntent);
                 }
-                else if (showServerResp){
-                    Toast.makeText(DaddyAreaActivity.this,s,Toast.LENGTH_LONG ).show();
-                }
                 else{
-                    Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Error: " + s, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -303,9 +300,6 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                 showServerResp = false;
                 if (tup.getResponseCode() == 201){
                     callPhoneMap = true;
-                }
-                else if (tup.getResponseCode() == 400){
-                    showServerResp = true;
                 }
                 return tup.response;
             }

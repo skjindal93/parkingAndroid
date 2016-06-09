@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +20,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class SensorDetailActivity extends AppCompatActivity {
+public class SensorDetailActivity extends AppCompatActivity implements View.OnClickListener{
 
     int piId;
     int piPort;
@@ -34,7 +36,15 @@ public class SensorDetailActivity extends AppCompatActivity {
         piPort = intent.getIntExtra("piPort",-1);
         sensorDetail = (TextView)findViewById(R.id.sensorDetail);
         getJSON();
+        Button refreshSensorDetail = (Button)findViewById(R.id.refreshSensorDetail);
+        refreshSensorDetail.setOnClickListener(this);
 
+    }
+
+    public void onClick(View view){
+        if (view.getId() == R.id.refreshSensorDetail){
+            getJSON();
+        }
     }
 
     private String generateText(int piId, int piPort, double lati, double longi, boolean occupied){
@@ -116,7 +126,7 @@ public class SensorDetailActivity extends AppCompatActivity {
                 NetworkOps rh = new NetworkOps();
                 String s = rh.sendGetRequest(Config.URL_SENSOR_DETAIL + piId + "/" + piPort + "/");  /// TODO: UPDATE URL
                 showSensorDetail = true;
-                if (s == "timeout" || s == "error"){
+                if (s == "timeout" || s == "error" || s.startsWith("error:")){
                     showSensorDetail= false;
                 }
                 return s;

@@ -202,7 +202,7 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
                 NetworkOps rh = new NetworkOps();
                 String s = rh.sendGetRequest(Config.URL_LIST_AREA + regionIdSelected);
                 callupdateAreaList = true;
-                if (s == "timeout" || s == "error"){
+                if (s == "timeout" || s == "error" || s.startsWith("error:")){
                     callupdateAreaList= false;
                 }
                 return s;
@@ -252,11 +252,8 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
                     myIntent.putExtra("areaName",params.get("name").toString());
                     ParkingAreaActivity.this.startActivity(myIntent);
                 }
-                else if (showServerResp){
-                    Toast.makeText(ParkingAreaActivity.this,s,Toast.LENGTH_LONG ).show();
-                }
                 else{
-                    Toast.makeText(getApplicationContext(), "Error occurred while connecting to server.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Error: "+ s, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -268,9 +265,6 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
                 showServerResp = false;
                 if (tup.getResponseCode() == 201){
                     callPhoneMap = true;
-                }
-                else if (tup.getResponseCode() == 400){
-                    showServerResp = false;
                 }
                 return tup.response;
             }

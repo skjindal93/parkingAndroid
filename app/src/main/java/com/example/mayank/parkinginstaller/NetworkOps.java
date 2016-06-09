@@ -4,9 +4,11 @@ import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.util.StringBuilderPrinter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -65,14 +67,15 @@ public class NetworkOps {
         Log.i(TAG,logString);
         URL url;
         //StringBuilder object to store the message retrieved from the server
-        StringBuilder sb = new StringBuilder();
         Tuple tup = null;
+        int responseCode = 404;
+        HttpURLConnection conn= null;
         try {
             //Initializing Url
             url = new URL(requestURL);
 
             //Creating an httmlurl connection
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
 
             //Configuring connection properties
             conn.setReadTimeout(2000);
@@ -93,21 +96,37 @@ public class NetworkOps {
             writer.flush();
             writer.close();
             os.close();
-            int responseCode = conn.getResponseCode();
+            responseCode = conn.getResponseCode();
+
+
+
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             String response;
             //Reading server response
             while ((response = br.readLine()) != null){
                 sb.append(response);
             }
-            Log.i(TAG,"POST Output: " + sb.toString());
+            Log.i(TAG,"POST Output: Reponse Code: " + responseCode + " " + sb.toString());
             tup = new Tuple(responseCode,sb.toString());
 
         } catch (Exception e) {
-            Log.i(TAG,"POST Output: " + sb.toString());
+            StringBuilder sb = new StringBuilder();
+            if (conn != null) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                String response;
+                //Reading server response
+                try {
+                    while ((response = br.readLine()) != null){
+                        sb.append(response);
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            Log.i(TAG,"POST Error Output: Reponse Code: " + responseCode + " " + sb.toString());
             e.printStackTrace();
-            tup = new Tuple(404,"Timeout");
+            tup = new Tuple(responseCode,sb.toString());
         }
         return tup;
     }
@@ -119,9 +138,10 @@ public class NetworkOps {
     public String sendGetRequest(String requestURL, String id){
         Log.i(TAG,"Get Request sent to " + requestURL + id);
         StringBuilder sb =new StringBuilder();
+        HttpURLConnection con = null;
         try {
             URL url = new URL(requestURL+id);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con = (HttpURLConnection) url.openConnection();
             con.setConnectTimeout(2000);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
@@ -135,6 +155,20 @@ public class NetworkOps {
         }
         catch (Exception e){
             e.printStackTrace();
+            if (con != null){
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                String response;
+                //Reading server response
+                try {
+                    while ((response = br.readLine()) != null){
+                        sb.append(response);
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    return "error";
+                }
+                return "error: " + sb.toString();
+            }
             return "error";
         }
 
