@@ -126,7 +126,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
                 NetworkOps rh = new NetworkOps();
                 String s = rh.sendGetRequest(Config.URL_SENSOR_DETAIL + piId + "/" + piPort + "/");  /// TODO: UPDATE URL
                 showSensorDetail = true;
-                if (s == "timeout" || s == "error" || s.startsWith("error:")){
+                if (s.equals("timeout") || s.equals("error") || s.startsWith("error:")){
                     showSensorDetail= false;
                 }
                 return s;

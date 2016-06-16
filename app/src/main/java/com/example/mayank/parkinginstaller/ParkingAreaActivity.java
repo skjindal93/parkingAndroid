@@ -202,7 +202,7 @@ public class ParkingAreaActivity extends AppCompatActivity implements View.OnCli
                 NetworkOps rh = new NetworkOps();
                 String s = rh.sendGetRequest(Config.URL_LIST_AREA + regionIdSelected);
                 callupdateAreaList = true;
-                if (s == "timeout" || s == "error" || s.startsWith("error:")){
+                if (s.equals("timeout") || s.equals("error") || s.startsWith("error:")){
                     callupdateAreaList= false;
                 }
                 return s;

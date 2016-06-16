@@ -165,7 +165,7 @@ public class DaddyAreaActivity extends AppCompatActivity implements ExistingArea
                 String s = rh.sendGetRequest(Config.URL_LIST_REGIONS +
                         "?latitude=" + currentLocation.getLongitude() + "&longitude=" + currentLocation.getLongitude());
                 callupdateAreaList = true;
-                if (s == "timeout" || s == "error" || s.startsWith("error:")){
+                if (s.equals("timeout") || s.equals("error") || s.startsWith("error:")){
                     callupdateAreaList= false;
                 }
                 return s;

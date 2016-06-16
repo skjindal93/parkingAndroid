@@ -7,7 +7,7 @@ import java.math.RoundingMode;
  * Created by Mayank on 13-05-2016.
  */
 public class Config {
-    public static String server = "http://locatr.cse.iitd.ac.in:8001/";
+    public static String server = "http://api.greenboard.in/";
 
     public static String api_phoneMap = server + "installation/raspberryPhoneMap/";
     public static String URL_NEW_SENSOR = server + "installation/newSensor/";
@@ -23,6 +23,7 @@ public class Config {
     public static String TAG_REGION_NAME = "name";
     public static String TAG_REGION_ID = "id";
     public static String TAG_PORT = "pi_port";
+    public static String TAG_ECHO_PORT = "echo";
     public static String TAG_USED = "used";
 
 
@@ -34,4 +35,3 @@ public class Config {
         return bd.doubleValue();
     }
 }
-

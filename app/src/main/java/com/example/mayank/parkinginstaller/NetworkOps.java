@@ -1,6 +1,7 @@
 package com.example.mayank.parkinginstaller;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -139,43 +140,45 @@ public class NetworkOps {
         Log.i(TAG,"Get Request sent to " + requestURL + id);
         StringBuilder sb =new StringBuilder();
         HttpURLConnection con = null;
+        BufferedReader errorReader = null;
         try {
             URL url = new URL(requestURL+id);
             con = (HttpURLConnection) url.openConnection();
             con.setConnectTimeout(2000);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
             String s;
             while((s=bufferedReader.readLine())!=null){
                 sb.append(s+"\n");
             }
         }catch(SocketTimeoutException e){
             e.printStackTrace();
+            String ans = sb.toString();
+            Log.i(TAG,"GET output is " + ans);
             return "timeout";
         }
         catch (Exception e){
+            errorReader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
             e.printStackTrace();
-            if (con != null){
-                BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+            sb = new StringBuilder();
+            if (errorReader != null) {
                 String response;
                 //Reading server response
                 try {
-                    while ((response = br.readLine()) != null){
+                    while ((response = errorReader.readLine()) != null){
                         sb.append(response);
                     }
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                    return "error";
                 }
-                return "error: " + sb.toString();
             }
-            return "error";
+            Log.i(TAG,"GET Error Output: Response: "+ sb.toString());
+            return "error: " + sb.toString() ;
         }
-
         String ans = sb.toString();
         Log.i(TAG,"GET output is " + ans);
         return ans;
     }
+
 
     private String getPostDataString(HashMap<Object, Object> params) throws UnsupportedEncodingException {
         StringBuilder result = new StringBuilder();

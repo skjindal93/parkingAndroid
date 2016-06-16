@@ -17,10 +17,12 @@ import java.util.List;
 
 class SensorStatus{
     String sensorName;
+    String echoPort;
     boolean status;
 
-    public SensorStatus(String sensorName, boolean status){
+    public SensorStatus(String sensorName, String echoPort, boolean status){
         this.sensorName = sensorName;
+        this.echoPort = echoPort;
         this.status = status;
     }
 
@@ -67,7 +69,7 @@ public class SensorArrayAdapter extends ArrayAdapter<SensorStatus> {
 
             TextView sensorPort = (TextView)v.findViewById(R.id.sensorPort);
             TextView sensorStatus = (TextView)v.findViewById(R.id.statusColor);
-            sensorPort.setText("Port No: " + ssInfo.sensorName);
+            sensorPort.setText("Port No: " + ssInfo.sensorName + ", Echo Port: " + ssInfo.echoPort);
             if (Integer.parseInt(ssInfo.sensorName) == selectedPort){
                 v.setBackgroundResource(R.color.pressed_color);
             }

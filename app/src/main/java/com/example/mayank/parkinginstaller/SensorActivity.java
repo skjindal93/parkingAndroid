@@ -240,8 +240,9 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
             for(int i = 0; i<result.length(); i++){
                 JSONObject jo = result.getJSONObject(i);
                 String port = jo.getString(Config.TAG_PORT);
+                String echoPort = jo.getString(Config.TAG_ECHO_PORT);
                 boolean status = !jo.getBoolean(Config.TAG_USED);
-                SensorStatus sst = new SensorStatus(port, status);
+                SensorStatus sst = new SensorStatus(port, echoPort, status);
 //                Log.i(TAG,port + " " + status);
                 list.add(sst);
             }
@@ -283,7 +284,7 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
                 NetworkOps rh = new NetworkOps();
                 String s = rh.sendGetRequest(Config.URL_SENSOR_PI + "?pi=" + 1);  /// TODO: REMOVE HARDCODED PI ID
                 callShowSensors = true;
-                if (s == "timeout" || s == "error" || s.startsWith("error: ")){
+                if (s.equals("timeout") || s.equals("error") || s.startsWith("error: ")){
                     callShowSensors= false;
                 }
                 return s;
