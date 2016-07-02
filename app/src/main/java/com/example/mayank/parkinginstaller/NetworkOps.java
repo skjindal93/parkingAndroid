@@ -113,8 +113,17 @@ public class NetworkOps {
 
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder();
+            BufferedReader br = null;
             if (conn != null) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                try {
+                     br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                }
+                catch (NullPointerException ex){
+                    sb.append("POST request error, please try again!");
+                    tup = new Tuple(responseCode,sb.toString());
+                    ex.printStackTrace();
+                    return tup;
+                }
                 String response;
                 //Reading server response
                 try {
@@ -125,7 +134,8 @@ public class NetworkOps {
                     e1.printStackTrace();
                 }
             }
-            Log.i(TAG,"POST Error Output: Reponse Code: " + responseCode + " " + sb.toString());
+
+            Log.i(TAG,"POST Error Output: Response Code: " + responseCode + " " + sb.toString());
             e.printStackTrace();
             tup = new Tuple(responseCode,sb.toString());
         }
@@ -156,23 +166,29 @@ public class NetworkOps {
             Log.i(TAG,"GET output is " + ans);
             return "timeout";
         }
-        catch (Exception e){
-            errorReader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            e.printStackTrace();
+        catch (Exception e) {
             sb = new StringBuilder();
-            if (errorReader != null) {
+            if (con != null) {
+                try {
+                    errorReader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                } catch (NullPointerException ex) {
+                    sb.append("GET Error, Please try again");
+                    return sb.toString();
+                }
+                e.printStackTrace();
+
                 String response;
                 //Reading server response
                 try {
-                    while ((response = errorReader.readLine()) != null){
+                    while ((response = errorReader.readLine()) != null) {
                         sb.append(response);
                     }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
+                Log.i(TAG, "GET Error Output: Response: " + sb.toString());
+                return "error: " + sb.toString();
             }
-            Log.i(TAG,"GET Error Output: Response: "+ sb.toString());
-            return "error: " + sb.toString() ;
         }
         String ans = sb.toString();
         Log.i(TAG,"GET output is " + ans);

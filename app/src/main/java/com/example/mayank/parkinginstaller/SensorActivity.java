@@ -282,7 +282,7 @@ public class SensorActivity extends AppCompatActivity implements AdapterView.OnI
             @Override
             protected String doInBackground(Void... params) {
                 NetworkOps rh = new NetworkOps();
-                String s = rh.sendGetRequest(Config.URL_SENSOR_PI + "?pi=" + 1);  /// TODO: REMOVE HARDCODED PI ID
+                String s = rh.sendGetRequest(Config.URL_SENSOR_PI + "?pi=" + piId);  /// TODO: REMOVE HARDCODED PI ID
                 callShowSensors = true;
                 if (s.equals("timeout") || s.equals("error") || s.startsWith("error: ")){
                     callShowSensors= false;
